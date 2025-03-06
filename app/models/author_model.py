@@ -14,7 +14,8 @@ class Author(db.Model):
         biography = db.Column(db.String(100), nullable = False)
         created_at = db.Column(db.DateTime, default = datetime.now())   # This is a time stamp
         updated_at = db.Column(db.DateTime, onupdate = datetime.now())  # This is a time stamp
-
+        specialisation = db.Column(db.String(50))
+        
             #foreign keys
     book_id= db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
@@ -34,6 +35,7 @@ class Author(db.Model):
          self.biography = biography
          self.created_at = created_at
          self.updated_at = updated_at
+         self.specialisation = specialisation
 
 
     

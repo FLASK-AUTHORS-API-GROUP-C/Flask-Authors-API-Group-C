@@ -16,6 +16,10 @@ class Book(db.Model):
     publication_date = db.Column(db.Integer, nullable = False)
     created_at = db.Column(db.DateTime, default = datetime.now())
     updated_at = db.Column(db.DateTime, default = datetime.now())
+    genre = db.Column(db.String(50))
+    specialisation = db.Column(db.String(50))
+    
+    
 
         #foreign keys
     author_id = db.Column(db.Integer, db.ForeignKey('Authors.id'), nullable=False)
@@ -36,8 +40,10 @@ class Book(db.Model):
         self.pages= pages
         self.publication_date = publication_date
         self.created_at = created_at
+        self.genre = genre
         self.updated_at = updated_at
+        self.specialisation = specialisation
 
-    
+
 
     

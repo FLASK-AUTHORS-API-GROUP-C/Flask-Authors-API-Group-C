@@ -15,7 +15,9 @@ class Company(db.Model):
     description = db.Column(db.String(200), nullable = False)
     created_at= db.Column(db.DateTime, default = datetime.now())
     updated_at = db.Column(db.DateTime, default = datetime.now())
-    
+    specialisation = db.Column(db.String(50))
+
+
     #foreign keys
     book_id= db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -31,6 +33,4 @@ class Company(db.Model):
         self.description = description
         self.created_at = created_at
         self.updated_at = updated_at
-
-
-      
+        self.specialisation = specialisation
