@@ -22,7 +22,7 @@ def register_user(): # registering the user
     author_contact = data.get('author_contact')
     email_address = data.get('email_address')
     password = data.get('password')
-    image = data.get('image')
+    user_type = data.get('type') if 'user_type' in data else "author"
     biography = data.get('biography')  if type == 'author' else ''
     created_at = data.get('created_at')
     updated_at= data.get('updated_at')
@@ -55,7 +55,7 @@ def register_user(): # registering the user
 
 
         #Creating the user
-         new_author = Author(first_name=first_name,last_name=last_name,password=hashed_password,email_addresss=email_address,author_contact=author_contact,biography=biography,updated_at=updated_at,created_at=created_at,image=image)
+         new_author = Author(first_name=first_name,last_name=last_name,password=hashed_password,email_address=email_address,author_contact=author_contact,biography=biography,updated_at=updated_at,created_at=created_at)
          db.session.add(new_author)
          db.session.commit()
 
@@ -118,7 +118,7 @@ def login():
                 return jsonify({'message': 'Invalid password'}), HTTP_400_BAD_REQUEST
 
         else:
-            return jsonify({'Message': 'Invalid email address'}), HTTP_401_UNAUTHORIZED
+            return jsonify({'message': 'Invalid email address'}), HTTP_401_UNAUTHORIZED
 
     except Exception as e:
         # Log the exception for debugging
