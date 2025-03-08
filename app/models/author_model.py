@@ -11,6 +11,7 @@ class Author(db.Model):        # The datatype and word limit should be defined e
     contact = db.Column(db.String(30),nullable=False,unique = True)
     email= db.Column(db.String(20),nullable=False, unique=True)
     password= db.Column(db.String(50),nullable=False)
+    address = db.Column(db.String(50),nullable=False)
     user_type = db.Column(db.String(20),default = 'author')
     created_at = db.Column(db.DateTime, default= datetime.now())
     updated_at = db.Column(db.DateTime,onupdate= datetime.now()) 

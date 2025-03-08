@@ -8,16 +8,16 @@ from flask_jwt_extended import create_access_token
 
 
 
-#auth Blueprint
-auth = Blueprint('auth',__name__,url_prefix='/api/v1/auth')
+#auth Blueprint defining the blueprint
+auth = Blueprint('auth',__name__,url_prefix='/api/v1/auth') # defining the prefix for api,version 1 and the table
 
 
 #User registration
 
-@auth.route('/register', methods = ['POST'])
-def register_user():
-    data = request.json
-    first_name = data.get('first_name')
+@auth.route('/register', methods = ['POST']) #Post is used when creating and registering users and json representaion format []
+def register_user(): # registering the user
+    data = request.json # variable of object storing data
+    first_name = data.get('first_name') #accessing variables from the table
     last_name = data.get('last_name')
     author_contact = data.get('author_contact')
     email_address = data.get('email_address')
@@ -28,26 +28,30 @@ def register_user():
     updated_at= data.get('updated_at')
 
 
-    if not first_name or not last_name or not author_contact or not email_address:
+#Request response cycle 
+
+    if not first_name or not last_name or not author_contact or not email_address: 
         return jsonify({"error: All fileds are required" }),HTTP_400_BAD_REQUEST
     
     if type == 'author' and not biography:
         return jsonify({'error': "Enter your author biography"}),HTTP_400_BAD_REQUEST
     
-    if len(password) < 8:
+    #The length of the 
+    if len(password) < 8: #Password should not be less than 8
         return jsonify({'error': "Password is too short"}),HTTP_400_BAD_REQUEST
     
-    if not validators.email(email_address):
+    if not validators.email(email_address): 
         return jsonify({"error":"Email is invalid"}),HTTP_400_BAD_REQUEST
     
-    if  Author.query.filter_by(email_address=email_address).first() is not None:
-          return jsonify({"error":"Email address in use"}),HTTP_409_CONFLICT
+    #key value pairs representing data to be accesed
+    if  Author.query.filter_by(email_address=email_address).first() is not None: #Ensuring email and contact constrains 
+          return jsonify({"error":"Email address in use"}),HTTP_409_CONFLICT #Accessing the model to check if the email is valid
     
     if Author.query.filter_by(author_contact=author_contact).first() is not None:
           return jsonify({"error":"Phone number already in use"}),HTTP_409_CONFLICT
     
     try:
-         hashed_password  = bcrypt.generate_password_hash('hunter2')# Hashing password
+         hashed_password  = bcrypt.generate_password_hash('hunter2')# Hashing password to encrypt password,to avoid unauthorised access
 
 
         #Creating the user
@@ -65,8 +69,8 @@ def register_user():
                    
                    'first_name':new_author.first_name,
                    'last_name':new_author.last_name,
-                   'author_contact':new_author.author_contact,
-                   'email_address':new_author.email_addresss,
+                   'contact':new_author.contact,
+                   'address':new_author.address,
                    'password':new_author.password,
                    'biography':new_author.biography,
                    'id':new_author.id
