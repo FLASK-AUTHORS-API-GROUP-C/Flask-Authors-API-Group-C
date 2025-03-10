@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy   #This is our object relational mapper
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager

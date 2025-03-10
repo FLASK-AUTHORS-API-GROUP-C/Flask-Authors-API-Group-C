@@ -45,7 +45,7 @@ def register_company():
         hashed_password = bcrypt.generate_password_hash('password') # hashing the password
 
         # Creating a company
-        new_company = Company(name = name,id = id,description = description, email = email, contact=contact,
+        new_company = Company(name = name,id = id,description = description, email = email, contact=contact,origin=origin,
                           contact=contact,)
         db.session.add(Company)
         db.session.commit()

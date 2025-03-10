@@ -2,6 +2,7 @@
 # Create a new application function
 # First import the module Flask
 from flask import Flask
+from flask_migrate import migrate
 #Import the db object
 from app.extensions import db,migrate,jwt
 
@@ -26,6 +27,8 @@ def create_app():
 
 #Register models from the application file.
     from app.models.author_model import Author
+    from app.models.company_model import Company
+    from app.models.book_model import Book
 
 
     @app.route('/')  # Add a route and a decorator and the route must be on top of the decorator.

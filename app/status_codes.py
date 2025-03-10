@@ -1,10 +1,10 @@
 HTTP_200_OK = 200
-HTTP_201_CREATED = 201
-HTTP_202_ACCEPTED = 202
-HTTP_400_BAD_REQUEST = 400
+HTTP_201_CREATED = 201  # Data has been successfully returned
+HTTP_202_ACCEPTED = 202  # Wen the new user hasbeen succefully created
+HTTP_400_BAD_REQUEST = 400  # When invalid information has been entered ie short password
 HTTP_401_UNAUTHORIZED = 401
 HTTP_404_NOT_FOUND = 404
-HTTP_500_INTERNAL_SERVER_ERROR = 500
-HTTP_409_CONFLICT = 409
+HTTP_500_INTERNAL_SERVER_ERROR = 500  # If there are any mistakes in the creation process
+HTTP_409_CONFLICT = 409  # When anything entered has already been used
 HTTP_403_FORBBIDEN = 403
-HTTP_409_NOT_CONFLICT = 409
+HTTP_409_NOT_CONFLICT = 409  # When anything entered has already been used

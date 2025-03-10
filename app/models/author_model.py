@@ -11,12 +11,13 @@ class Author(db.Model):
         email_addresss = db.Column(db.String(100), nullable = False, unique = True)
         password = db.Column(db.String(100), nullable = False, unique = True)
         user_type = db.Column(db.String(20),default = 'author')
+
         image = db.Column(db.String(100), nullable = True)
         biography = db.Column(db.String(100), nullable = False)
         created_at = db.Column(db.DateTime, default = datetime.now())   # This is a time stamp
         updated_at = db.Column(db.DateTime, onupdate = datetime.now())  # This is a time stamp
         
-        # Defining all the attributes
+        # Defining all the attributes (Creating a constractor) This is because  incase you create any new user, all these fields will be required
         def __init__(self,id,first_name,last_name, author_contact,email_addresss, password, image, biography, created_at,updated_at ):
          
          self.id = id
