@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.statuscode import HTTP_400_BAD_REQUEST,HTTP_409_NOT_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND,HTTP_403_FORBIDDEN,HTTP_200_OK
+from app.status_code import HTTP_400_BAD_REQUEST,HTTP_409_NOT_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND,HTTP_403_FORBIDDEN,HTTP_200_OK
 import validators
 from app.models.company_model import Company
 from app.extensions import db,bcrypt
@@ -10,7 +10,7 @@ company= Blueprint('company', __name__,url_prefix='/api/v1/company')
 
 # user registration
 
-@company.route("/register,methods=['POST']")
+@company.route("/register",methods=['POST'])
 def register_company():
 
     data = request.json
@@ -44,8 +44,7 @@ def register_company():
         hashed_password = bcrypt.generate_password_hash('password') # hashing the password
 
         # Creating a company
-        new_company = Company(name = name,id = id,description = description, email = email, contact=contact,
-                          contact=contact,)
+        new_company = Company(name = name,id = id,description = description, email = email,origin=origin, contact=contact)
         db.session.add(Company)
         db.session.commit()
 
@@ -54,7 +53,7 @@ def register_company():
 
         return jsonify({
             "message":company_name + "has been successfully created as a "+ new_company, 
-            "user":{
+            "company":{
                 "name":new_company.name,
                 "id":new_company.id,
                 "email":new_company.email,
