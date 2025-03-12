@@ -1,6 +1,6 @@
 
 from flask import Blueprint,request,jsonify
-from app.status_code import HTTP_400_BAD_REQUEST,HTTP_409_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_401_UNAUTHORIZED,HTTP_200_OK
+from app.status_code import HTTP_400_BAD_REQUEST,HTTP_200_OK,HTTP_401_UNAUTHORIZED,HTTP_409_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_401_UNAUTHORIZED,HTTP_200_OK
 import validators
 from app.models.author_model import Author
 from app.extensions import db,bcrypt
@@ -124,7 +124,49 @@ def login():
         # Log the exception for debugging
         print(f"Error: {str(e)}")
         return jsonify({
+            'error': str(e) }), HTTP_500_INTERNAL_SERVER_ERROR
+
+
+# user login
+
+@auth.post('/login')
+def login():
+     
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    try:
+        if not password or not email:
+            return jsonify({'Message':"Email and password are required"}),HTTP_400_BAD_REQUEST
+        user = Author.query.filter_by(email=email).first()
+        if user:
+            is_correct_password = bcrypt.check_password_hash(user.password,password)
+
+            if is_correct_password:
+                access_token = create_access_token(identity=user.id)
+                return jsonify({
+                'user':{
+                'id'  :user.id,
+                'username': user.get_full_name(),
+                'email' : user.email,
+                'access_token' : access_token
+                }}),HTTP_200_OK
+                
+            else:
+                return jsonify({"Message":"Invalid password"}),HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({"Message":'Invalid email address'}),HTTP_401_UNAUTHORIZED
+
+    except Exception as e:
+        return jsonify({
             'error': str(e)
-        }), HTTP_500_INTERNAL_SERVER_ERROR
+        }),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+
+
+
+
 
 
