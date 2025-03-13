@@ -11,9 +11,6 @@ from app.extensions import db,migrate,jwt
 #import migrate
 
 
-
-
-
 def create_app():
 
     app = Flask(__name__) # Creat the app name and path in the parameter name
@@ -29,6 +26,11 @@ def create_app():
     from app.models.author_model import Author
     from app.models.company_model import Company
     from app.models.book_model import Book
+
+
+
+
+# Regestering blueprints
 
 
     @app.route('/')  # Add a route and a decorator and the route must be on top of the decorator.

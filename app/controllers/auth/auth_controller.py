@@ -1,7 +1,7 @@
 from flask import Blueprint,request,jsonify  # The bluerprint  is for verifying the endpionts, request is to ensure we get the responses from jsonify
 from app.status_codes import HTTP_400_BAD_REQUEST,HTTP_409_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_401_UNAUTHORIZED,HTTP_200_OK
-import validators  # This is for calidating the emails
-from app.models.author_model import Author # This is to enable us to access the Author model attributes, And to make queris to the database checking whether somethings appear twice.
+import validators  # This is for validating the emails
+from app.models.author_model import Author # This is to enable us to access the Author model attributes, And to make queries to the database checking whether somethings appear twice.
 from app.extensions import db,bcrypt  # This is to ensure that we roll back incase of any mistakes. (we undo any steps) 
 from flask_jwt_extended import create_access_token
 
@@ -57,7 +57,7 @@ def register_user():
     if Author.query.filter_by(author_contact=author_contact).first() is not None:   # This checks whether the contact was already in use
           return jsonify({"error":"Phone number already in use"}),HTTP_409_CONFLICT  # This is used whenever there is a violation or something that already exists
     
-    #  While Creating a new use,r we work with the hashing
+    #  While Creating a new user, we work with the hashing
     # Hashing is used to encript(No user can understand)
     # We hash the paasswords inorder to encript security
 
@@ -116,43 +116,43 @@ def register_user():
 
     
     
-#     #User login
-# @auth.post('/login')  # This is implemented in the auth blueprint
-# def login():
-#     email_address = request.json.get('email_address')
-#     password = request.json.get('password')
+    #User login
+@auth.post('/login')  # This is implemented in the auth blueprint
+def login():
+    email_address = request.json.get('email_address')
+    password = request.json.get('password')
 
-#     try:
-#         if not password or not email_address:
-#             return jsonify({'Message': 'Email and password are required'}), HTTP_400_BAD_REQUEST
+    try:
+        if not password or not email_address:
+            return jsonify({'Message': 'Email and password are required'}), HTTP_400_BAD_REQUEST
 
-#         author = Author.query.filter_by(email_address=email_address).first()
+        author = Author.query.filter_by(email_address=email_address).first()
 
-#         if author:
-#             # Corrected variable name and comparison
-#             is_correct_password = bcrypt.check_password_hash(author.password, password)
+        if author:
+            # Corrected variable name and comparison
+            is_correct_password = bcrypt.check_password_hash(author.password, password)
             
-#             if is_correct_password:
-#                 access_token = create_access_token(identity=author.id)
+            if is_correct_password:
+                access_token = create_access_token(identity=author.id)
 
-#                 return jsonify({
-#                     'user': {
-#                         'id': author.id,
-#                         'username': author.get_full_name(),  # Corrected method call
-#                         'email': author.email_address,  # Fixed typo
-#                         'access_token': access_token
-#                     }
-#                 }), HTTP_200_OK
+                return jsonify({
+                    'user': {
+                        'id': author.id,
+                        'username': author.get_full_name(),  # Corrected method call
+                        'email': author.email_address,  # Fixed typo
+                        'access_token': access_token
+                    }
+                }), HTTP_200_OK
 
-#             else:
-#                 return jsonify({'message': 'Invalid password'}), HTTP_400_BAD_REQUEST
+            else:
+                return jsonify({'message': 'Invalid password'}), HTTP_400_BAD_REQUEST
 
-#         else:
-#             return jsonify({'Message': 'Invalid email address'}), HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({'Message': 'Invalid email address'}), HTTP_401_UNAUTHORIZED
 
-#     except Exception as e:
-#         # Log the exception for debugging
-#         print(f"Error: {str(e)}")
-#         return jsonify({
-#             'error': str(e)
-#         }), HTTP_500_INTERNAL_SERVER_ERROR
+    except Exception as e:
+        # Log the exception for debugging
+        print(f"Error: {str(e)}")
+        return jsonify({
+            'error': str(e)
+        }), HTTP_500_INTERNAL_SERVER_ERROR
