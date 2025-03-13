@@ -9,7 +9,7 @@ from flask_jwt_extended import JWTManager, jwt_required,get_jwt_identity
 
 
  #book blueprint
-book = Blueprint('books', __name__,url_prefix = '/api/v1/books')
+book = Blueprint('books', __name__,url_prefix = '/api/v1/books') #it's used to define routes related to books.
 
 
 #Creating books
@@ -37,7 +37,7 @@ def create_newbook():
 #validating the incoming request
     if not title or not isbn  or not description or not price or not price_unit or not genre or not publication_date:
             return jsonify({"error": "All fields are required"}), HTTP_400_BAD_REQUEST
-
+#This is used to convert Python dictionaries into JSON format
     
     if Book.query.filter_by(title=title,author_id=author_id).first() is not None:      
           return jsonify({"error": "Book with this title and user id already exists"}), HTTP_400_BAD_REQUEST
@@ -52,7 +52,7 @@ def create_newbook():
 
           new_book = Book(title=title,pages=pages,image=image,isbn=isbn,genre=genre,price=price)
                         
-          db.session.add(new_book)
+          db.session.add(new_book)  #This is the database extension for SQLAlchemy, used to interact with the database.
           db.session.commit()
            
           return jsonify({
