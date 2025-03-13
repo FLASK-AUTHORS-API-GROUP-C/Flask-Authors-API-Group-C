@@ -10,13 +10,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 # auth blueprint
 auth = Blueprint('auth', __name__,url_prefix='/api/v1/auth')
 
-
 # author registration
 
 @auth.route("/register",methods=['POST'])
 def register_author():
 
     data = request.json
+    author_id =data.get('author_id')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     email   = data.get('email')
@@ -32,6 +32,8 @@ def register_author():
     
     if not password:
         return jsonify({"error": "Password is required."}),HTTP_400_BAD_REQUEST
+    print("Received Password:", password)
+   
     # ensuring the user enters the author's biography
     if not bio:
         return jsonify({"error":"Enter the author's biography."}),HTTP_400_BAD_REQUEST
@@ -59,16 +61,17 @@ def register_author():
     # Bcrypt is a flask extension that provides bcrypt hashing utilies for an application.
     try:
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8') # hashing the password
-        
-
+    
+      
         # Creating an author
         new_author=Author(
-            first_name=first_name,
-            last_name=last_name,
-            password=hashed_password,
-            email=email,
-            contact=contact,
-            bio=bio
+            author_id =author_id,
+            first_name = first_name,
+            last_name = last_name,
+            password = hashed_password,
+            email = email,
+            contact = contact,
+            bio = bio
             )
         db.session.add(new_author)
         db.session.commit()
@@ -84,7 +87,8 @@ def register_author():
                 "email":new_author.email,
                 "contact":new_author.contact,
                 "password":new_author.password,
-                "bio":new_author.bio
+                "bio":new_author.bio,
+                "author_id":new_author.author_id
                 }
                 
             }),HTTP_201_CREATED
@@ -118,12 +122,12 @@ def login():
 
             if is_correct_password:
                 # Generate JWT token (if using Flask-JWT-Extended)
-                access_token = create_access_token(identity=author.id)
-                refresh_token = create_refresh_token(identity=author.id)
+                access_token = create_access_token(identity=author.author_id)
+                refresh_token = create_refresh_token(identity=author.author_id)
                 return jsonify({
                     "author":{
-                        "author_id":author.id,
-                        "name":author.get_full_name,
+                        "author_id":author.author_id,
+                        "name":author.get_full_name(),
                         "email":author.email,
                         "access_token":access_token,
                         "refresh_token":refresh_token
@@ -138,6 +142,7 @@ def login():
           
         else:
             return jsonify({"message": "Invalid email address."}), HTTP_401_UNAUTHORIZED
+        
 
         
         

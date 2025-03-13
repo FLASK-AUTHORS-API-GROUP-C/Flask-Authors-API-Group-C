@@ -5,7 +5,7 @@ from datetime import datetime
 # adding a constructor.
 class Company(db.Model):
 
-    __tablename__="Company"
+    __tablename__="companies"
     company_id = db.Column(db.Integer,primary_key=True,autoincrement=True,nullable=False)
     name =db.Column(db.String(50),nullable =False)
     origin =db.Column(db.String(50),nullable=False)

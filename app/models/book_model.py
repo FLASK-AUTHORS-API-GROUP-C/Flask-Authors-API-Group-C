@@ -4,7 +4,7 @@ from datetime import datetime
 # Book class.
 class Book(db.Model):
 
-    __tablename__ ="Books"
+    __tablename__ ="books"
     book_id = db.Column(db.Integer,primary_key = True,autoincrement = True,nullable = False)
     title = db.Column(db.String(255),nullable = False)
     image = db.Column(db.String(255),nullable = True) 
