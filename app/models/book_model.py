@@ -5,14 +5,14 @@ from datetime import datetime
 
 
 class Book(db.Model):
-    __tablename__ = "Books"
+    __tablename__ = "books"
     id= db.Column(db.Integer, primary_key=True)
     title= db.Column(db.String(30),nullable=False)
     price= db.Column(db.String(20),nullable=False)
     description= db.Column(db.String(50),nullable=False) 
     image = db.Column(db.String(50),nullable=True)
     publication_date = db.Column(db.Date,nullable = False)
-    isbn = db.Column(db.String(30),nullable=True,Unique=True)
+    isbn = db.Column(db.String(30),nullable=True,unique=True)
     pages = db.Column(db.String(30),nullable=False)
     genre = db.Column(db.String(50),nullable=False)
     unit_price = db.Column(db.String(20),nullable=False)

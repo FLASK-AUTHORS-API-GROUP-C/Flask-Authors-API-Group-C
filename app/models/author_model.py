@@ -10,19 +10,18 @@ class Author(db.Model):        # The datatype and word limit should be defined e
     biography = db.Column(db.String(20),nullable=True)
     contact = db.Column(db.String(30),nullable=False,unique = True)
     email= db.Column(db.String(20),nullable=False, unique=True)
-    password= db.Column(db.String(50),nullable=False)
-    address = db.Column(db.String(50),nullable=False)
-    user_type = db.Column(db.String(20),default = 'author')
-    created_at = db.Column(db.DateTime, default= datetime.now())
-    updated_at = db.Column(db.DateTime,onupdate= datetime.now()) 
+    password= db.Column(db.String(250),nullable=False)
+    created_at = db.Column(db.DateTime, default= datetime.now)
+    updated_at = db.Column(db.DateTime,onupdate= datetime.now) 
     
-    def __init__(self,first_name,last_name,contact,email,password):
+    def __init__(self,first_name,last_name,contact,email,password, biography):
         super(Author,self).__init__()
         self.first_name = first_name
         self.last_name = last_name
         self.contact = contact
         self.email = email
-        self.Password= password
+        self.password= password
+        self.biography = biography
 
     def get_full_name(self):
         return f"{self.last_name} {self.first_name}"
