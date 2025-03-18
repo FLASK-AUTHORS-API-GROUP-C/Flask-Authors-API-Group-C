@@ -11,7 +11,7 @@ from flask_jwt_extended import create_access_token
 auth = Blueprint('auth',__name__,url_prefix='/api/v1/auth')
 
 
-#User registration
+# storing request values
 
 @auth.route('/register', methods = ['POST'])
 def register_user():
@@ -22,10 +22,11 @@ def register_user():
     email_address = data.get('email_address')
     password = data.get('password')
     image = data.get('image')
-    biography = data.get('biography')  if type == 'author' else ''
+    biography = data.get('biography')
     created_at = data.get('created_at')
     updated_at= data.get('updated_at')
 
+# validation of data 
 
     if not first_name or not last_name or not author_contact or not email_address:
         return jsonify({"error: All fileds are required" }),HTTP_400_BAD_REQUEST
