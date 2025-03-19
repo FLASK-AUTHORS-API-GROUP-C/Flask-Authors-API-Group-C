@@ -13,7 +13,7 @@ class Book(db.Model):
     description = db.Column(db.String(200), nullable = False)
     image = db.Column(db.String(20), nullable = True)
     author_id = db.Column(db.Integer,db.ForeignKey('authors.id'))
-    company_id = db.Column(db.Integer,db.ForeignKey('company.id'))
+    company_id = db.Column(db.Integer,db.ForeignKey('companies.id'))
     author = db.relationship('Author',backref = 'books')
     company = db.relationship('Company',backref = 'books')
     pages = db.Column(db.Integer, nullable = False)

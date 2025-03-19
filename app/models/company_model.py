@@ -6,7 +6,7 @@ from datetime import datetime
 
 class Company(db.Model):
     #Adding the name of the table
-    __tablename__  = 'company'
+    __tablename__  = 'companies'
 
     # Adding a constructor
     

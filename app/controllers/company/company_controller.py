@@ -37,7 +37,7 @@ def register_company():
     try:
         
         # Creating a company
-        new_company = Company(name = name,description = description,origin=origin,author_id=author_id)
+        new_company = Company(name = name,description = description,origin=origin)
         db.session.add(new_company)
         db.session.commit()
 
