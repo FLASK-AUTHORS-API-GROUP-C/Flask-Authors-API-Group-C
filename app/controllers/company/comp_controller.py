@@ -10,7 +10,7 @@ company= Blueprint('company', __name__,url_prefix='/api/v1/company')
 
 # user registration
 
-@company.route("/register,methods=['POST']")
+@company.route("/register",methods=['POST'])
 def register_company():
 
     data = request.json
@@ -44,8 +44,7 @@ def register_company():
         hashed_password = bcrypt.generate_password_hash('password') # hashing the password
 
         # Creating a company
-        new_company = Company(name = name,id = id,description = description, email = email, contact=contact,
-                          contact=contact,)
+        new_company = Company(name = name,id = id,description = description, email = email,origin=origin, contact=contact)
         db.session.add(Company)
         db.session.commit()
 
@@ -54,7 +53,7 @@ def register_company():
 
         return jsonify({
             "message":company_name + "has been successfully created as a "+ new_company, 
-            "user":{
+            "company":{
                 "name":new_company.name,
                 "id":new_company.id,
                 "email":new_company.email,
@@ -140,3 +139,6 @@ def delete_company(id):
         return jsonify({"message": "Company deleted successfully"}),HTTP_200_OK
     except Exception as e:
         return jsonify({"error": str(e)}),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
