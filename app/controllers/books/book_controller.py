@@ -91,6 +91,7 @@ def create_newbook():
 
 
 
+
 # Define the update book endpoint
 @book.route('/edit/<int:book_id>', methods=["PUT"])
 def update_book(book_id):
@@ -114,6 +115,12 @@ def update_book(book_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
 
 # Define the delete book endpoint
 @book.route('/delete/<int:book_id>', methods=["DELETE"])

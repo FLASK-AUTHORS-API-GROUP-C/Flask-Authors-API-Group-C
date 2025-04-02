@@ -1,7 +1,9 @@
 from flask import Blueprint,request,jsonify  # The bluerprint  is for verifying the endpionts, request is to ensure we get the responses from jsonify
-from app.status_codes import HTTP_400_BAD_REQUEST,HTTP_409_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_401_UNAUTHORIZED,HTTP_200_OK
+from app.status_codes import HTTP_400_BAD_REQUEST,HTTP_409_CONFLICT,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_401_UNAUTHORIZED,HTTP_200_OK,HTTP_404_NOT_FOUND,HTTP_403_FORBBIDEN
 import validators  # This is for validating the emails
 from app.models.author_model import Author # This is to enable us to access the Author model attributes, And to make queries to the database checking whether somethings appear twice.
+from app.models.company_model import Company
+from app.models.book_model import Book
 from app.extensions import db,bcrypt  # This is to ensure that we roll back incase of any mistakes. (we undo any steps) 
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 # from email_validator import validate_email ,EmailNotValidError
@@ -76,15 +78,7 @@ def register_user():
 
 
         #Creating the  new instance for our  Author
-         new_author = Author(
-                             first_name=first_name,
-                             last_name=last_name,
-                             password=hashed_password,
-                             email_addresss=email_addresss,
-                             author_contact=author_contact,
-                             user_type=user_type,
-                             biography=biography,
-                             image=image)
+         new_author = Author( first_name=first_name,last_name=last_name,password=hashed_password,email_addresss=email_addresss,author_contact=author_contact,user_type=user_type, biography=biography,image=image)
          
 # Inorder to store the new user object, we have to add that object to   the session and the commit 
 
@@ -92,6 +86,7 @@ def register_user():
          db.session.commit()
          db.session.refresh(new_author)
          db.session.rollback() # Then commit
+
 
 
          # Define a variable that keeps track of the author name
@@ -186,7 +181,88 @@ def refresh():
     
 
 
-# Deleting the user
+# Get all  aothors from the database
+@auth.get('/authors')
+def getAllAuthors():
 
+    try:
+        all_authors = Author.query.filter_by(user_type = 'author').all()
+
+        authors_data = []
+        for author in all_authors:
+            author_info = {
+                'id':author.id,
+                'first_name':author.first_name,
+                'last_name':author.last_name,
+                'user_name':author.get_full_name(),
+                'email_addresss':author.email_addresss,
+                'author_contact':author.author_contact,
+                'biography': author.biography,
+                'created_at':author.created_at,
+                # 'companies':[],
+                'books':[]
+               
+
+            }
+
+            if hasattr(author, 'books'):
+                author_info['books'] = [{'id': book.id, 'title': book.title, 'price':book.price, 'genre': book.id, 'price_unit': book.price_unit, 'description': book.description, 'publication': book.publication_date,  'image': book.image, 'created_at': book.created_at} for book in author.books]
+
+
+
+            # if hasattr(author, 'companies'):
+            #     author_info['companies'] = [{'id': company.id, 'name':company.name, 'origin': company.origin} for company in author.company]  
+
+            # Access the authors list
+
+            authors_data.append(author_info)
+
+        # Ensure that the variable is serialised. This means us having the ability to access the value that is converted to json easily.
+        return jsonify({
+            'message':'All authors retrieved successfuly',
+            'total': len(authors_data),
+            'authors': authors_data  #This will return authors data list
+
+        }),HTTP_200_OK
+    
+
+
+
+    except Exception as e:
+        return jsonify({
+            'error':str(e)
+        }),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+
+
+# Deleting author
+
+@auth.route('/delete/<int:id>', methods = ['DELETE'])
+@jwt_required()
+def deleteAuthor(id):
+     try:
+         current_author = get_jwt_identity()
+         loggedInAuthor = Author.query.filter_by(id=current_author).first()
+
+         # Get author by id
+         author = Author.query.filter_by(id=id).first()
+
+
+         if not author: 
+             return jsonify({'error': 'Author not found'}),HTTP_404_NOT_FOUND
+         elif loggedInAuthor.author_type!= 'admin':
+             return jsonify({'error': 'You are not authorised to delete this author'}),HTTP_403_FORBBIDEN
+         
+         
+         
+
+         
+
+     except Exception as e:
+         return jsonify({
+             'error': 'Athour deleted successflly'
+         }),HTTP_404_NOT_FOUND
 
 

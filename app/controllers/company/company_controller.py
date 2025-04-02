@@ -19,7 +19,7 @@ def register_company():
 # Storing request values.
     data = request.json
     name = data.get('name')
-    author_id = get_jwt_identity()
+    # author_id = get_jwt_identity()
     origin= data.get('origin')
     description = data.get('description', '')if type == "description" else ''
     
@@ -68,119 +68,119 @@ def register_company():
 
 
     
-#Reading the company  
-@company.route('/<int:id>', methods=['GET'])
-@jwt_required()
-def get_company(id):
-    company = Company.query.get(id)
+# #Getting the company  
+# @company.route('/<int:id>', methods=['GET'])
+# @jwt_required()
+# def get_company(id):
+#     company = Company.query.get(id)
 
-    if not company:
-        return jsonify({"message": "Company not found"}), HTTP_200_OK
+#     if not company:
+#         return jsonify({"message": "Company not found"}), HTTP_200_OK
 
-    return jsonify({
-        "id": company.id,
-        "name": company.name,
-        "description": company.description,
-        "origin": company.origin,
-    }), HTTP_200_OK 
-
-
-
-
-# Updating a Company
-@company.route('/update/<int:id>', methods=['PUT','PATCH'])
-@jwt_required()
-def updateCompanyDetails(id):
+#     return jsonify({
+#         "id": company.id,
+#         "name": company.name,
+#         "description": company.description,
+#         "origin": company.origin,
+#     }), HTTP_200_OK 
 
 
 
-    try:
-        current_user_id = get_jwt_identity()
-        loggedInUser = Company.query.filter_by(id=current_user_id).first()
+
+# # Updating a Company
+# @company.route('/update/<int:id>', methods=['PUT','PATCH'])
+# @jwt_required()
+# def updateCompanyDetails(id):
 
 
-       # Get company by id
-        company = Company.query.filter_by(id=id).first()
+
+#     try:
+#         current_user_id = get_jwt_identity()
+#         loggedInUser = Company.query.filter_by(id=current_user_id).first()
 
 
-        if not company:
-            return jsonify({"message": "Company not found"}), HTTP_404_NOT_FOUND
-
-        #  Only the owner can update the company
-        elif loggedInUser.author_type!='admin' and company.author_id!=current_user_id:
-            return jsonify({"message": "Tou are not authorized to update the company details"}), HTTP_403_FORBBIDEN
-
-        else:
-            # Store request data
-            name = request.get_json().get('name',company.name)
-            origin = request.get_json().get('origin',company.origin)
-            description = request.get_json().get('description',company.description)
+#        # Get company by id
+#         company = Company.query.filter_by(id=id).first()
 
 
-            if name != company.name and auth.query.filter_by(name=name).first():
-                return jsonify({
-                    'error':'Name already in use'
-                    }),HTTP_409_CONFLICT
+#         if not company:
+#             return jsonify({"message": "Company not found"}), HTTP_404_NOT_FOUND
+
+#         #  Only the owner can update the company
+#         elif loggedInUser.author_type!='admin' and company.author_id!=current_user_id:
+#             return jsonify({"message": "Tou are not authorized to update the company details"}), HTTP_403_FORBBIDEN
+
+#         else:
+#             # Store request data
+#             name = request.get_json().get('name',company.name)
+#             origin = request.get_json().get('origin',company.origin)
+#             description = request.get_json().get('description',company.description)
+
+
+#             if name != company.name and auth.query.filter_by(name=name).first():
+#                 return jsonify({
+#                     'error':'Name already in use'
+#                     }),HTTP_409_CONFLICT
             
 
 
-            company.name = name
-            company.origin = origin
-            company.description = description
+#             company.name = name
+#             company.origin = origin
+#             company.description = description
 
 
             
-            db.session.commit()
+#             db.session.commit()
 
-            # Get username
+#             # Get username
             
-            return jsonify({
-                "message":name + " 's details have been successfully updated",
-                'User':{
-                            "id": company.id,
-        "name": company.name,
-        "description": company.description,
-        "origin": company.origin,
+#             return jsonify({
+#                 "message":name + " 's details have been successfully updated",
+#                 'User':{
+#                             "id": company.id,
+#         "name": company.name,
+#         "description": company.description,
+#         "origin": company.origin,
                     
                     
-                }
-            })
+#                 }
+#             })
         
 
 
-    except Exception as e:
-        return jsonify({
-            "error": str(e)
-            }), HTTP_500_INTERNAL_SERVER_ERROR
+#     except Exception as e:
+#         return jsonify({
+#             "error": str(e)
+#             }), HTTP_500_INTERNAL_SERVER_ERROR
 
 
 
 
 
     
-# deleting the company
-company.route('/delete/<int:id>',methods=['DELETE'])
-@jwt_required()
-def delete_company(id):
-    try:
-        current_company = get_jwt_identity()
+# # deleting the company
+# @company.route('/delete/<int:id>',methods=['DELETE'])
+# @jwt_required()
+# def delete_company(id):
+#     try:
+#         current_company = get_jwt_identity()
 
-        company_to_be_deleted =Company.query.get(id)
+#         company_to_be_deleted =Company.query.get(id)
 
 
-        # validations
-        if not company_to_be_deleted:
-            return jsonify({"message": "Company not found"}),HTTP_404_NOT_FOUND
+#         # validations
+#         if not company_to_be_deleted:
+#             return jsonify({"message": "Company not found"}),HTTP_404_NOT_FOUND
         
-        if company_to_be_deleted.owner_id != current_company:
-            return jsonify({"message": "Unauthorized"}),HTTP_403_FORBBIDEN
+#         if company_to_be_deleted.owner_id != current_company:
+#             return jsonify({"message": "Unauthorized"}),HTTP_403_FORBBIDEN
         
-        db.session.delete(company_to_be_deleted)
-        db.session.commit()
+#         db.session.delete(company_to_be_deleted)
+#         db.session.commit()
 
-        return jsonify({"message": "Company deleted successfully"}),HTTP_200_OK
-    except Exception as e:
-        return jsonify({"error": str(e)}),HTTP_500_INTERNAL_SERVER_ERROR
+#         return jsonify({"message": "Company deleted successfully"}),HTTP_200_OK
+#     except Exception as e:
+#         return jsonify({"error": str(e)}),HTTP_500_INTERNAL_SERVER_ERROR
 
 
 

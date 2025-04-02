@@ -11,7 +11,7 @@ class Author(db.Model):
         email_addresss = db.Column(db.String(100), nullable = False, unique = True)
         password = db.Column(db.String(255), nullable = False, unique = True)
         user_type = db.Column(db.String(20),default = 'author')
-
+        # company = db.Column(db.String(255), nullable=True, unique = False) 
         image = db.Column(db.String(100), nullable = True)
         biography = db.Column(db.String(100), nullable = False)
         created_at = db.Column(db.DateTime, default = datetime.now())   # This is a time stamp
