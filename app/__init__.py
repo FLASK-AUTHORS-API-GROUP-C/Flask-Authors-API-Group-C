@@ -1,7 +1,7 @@
 from flask import Flask
 from app.extensions import db,migrate,jwt
 from app.controllers.auth.auth_controller import auth
-from app.controllers.company.comp_controller import company
+from app.controllers.company.comp_controller import companies
 from app.controllers.books.book_controller import books
 from flask import Blueprint,request,jsonify
 
@@ -27,7 +27,7 @@ def create_app():
 
     # registering blue prints
     app.register_blueprint(auth)
-    app.register_blueprint(company)
+    app.register_blueprint(companies)
     app.register_blueprint(books)
 
 
