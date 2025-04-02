@@ -62,6 +62,7 @@ def GetAllAuthors():
     try:
         all_authors = Author.query.filter_by().all()
         authors_data = []
+        
         for author in all_authors:
             author_info = {
                 'id' : author.id,
@@ -72,13 +73,13 @@ def GetAllAuthors():
                 'biography' : author.biography,
                 'created_at': author.created_at,
                 'companies': [],
-                'books': []
+                'book': []
 
             }
 
-            if hasattr(author,'books'):
+            if hasattr(author,'book'):
                  
-                    author_info['books'] = [ { 'id':book.id,'title':book.title,'price':book.price,'genre':book.id,'description':book.description,'publication':book.publication_date,'image':book.image,'created_at':book.created_at} for book in author.book ]
+                    author_info['book'] = [ { 'id':book.id,'title':book.title,'price':book.price,'genre':book.id,'description':book.description,'publication':book.publication_date,'image':book.image,'created_at':book.created_at} for book in author.book ]
                 
             if hasattr(author,'companies'):
                     
@@ -98,7 +99,7 @@ def GetAllAuthors():
             }),HTTP_200_OK
 
 
-        return jsonify(all_authors)
+        return jsonify(all_authors)                                   
     
     
 
@@ -233,8 +234,6 @@ def UpdateUserDetails(id):
             'error': str(e)
 
         }),HTTP_500_INTERNAL_SERVER_ERROR
-
-
 
 
 

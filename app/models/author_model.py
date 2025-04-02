@@ -22,10 +22,12 @@ class Author(db.Model):        # The datatype and word limit should be defined e
         self.email = email
         self.password= password
         self.biography = biography
+        self.book = []
 
     def get_full_name(self):
         return f"{self.last_name} {self.first_name}"
-
+    def add_book(self,book):
+        self.book.append(book)
     
 
 
