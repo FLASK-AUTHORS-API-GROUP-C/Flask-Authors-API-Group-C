@@ -4,6 +4,8 @@
 from flask import Flask
 from flask_migrate import migrate
 from flask import Flask, Blueprint
+
+
 #Import the db object
 from app.controllers import company
 from app.extensions import db,migrate,jwt 

@@ -16,12 +16,13 @@ from flask_jwt_extended import create_access_token, create_refresh_token, get_jw
 auth = Blueprint('auth',__name__,url_prefix='/api/v1/auth') # 'auth' is the name we are going to use for grouping of the blueprints
 
 
+
 #Author registration
 #
-@auth.route('/register',methods = ['POST'])  # The decorator must piont at the name of the object Blueprint  thats why e use 'auth'
-#We use registor as the end ponit and ['POST'] as the method for creating
+@auth.route('/register',methods = ['POST'])  # The decorator must piont at the name of the object Blueprint  thats why we use 'auth'
+#We use register as the end ponit and ['POST'] as the method for creating
 # So from flask we import request 
-#Te route is used to bind the 
+#The route is used to bind the 
 
 
 # Define the function

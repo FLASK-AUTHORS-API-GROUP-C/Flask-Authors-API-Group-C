@@ -19,13 +19,12 @@ book = Blueprint('books', __name__,url_prefix = '/api/v1/books')
 def create_newbook():
 
    # storing request data
-    data = request.get_json()
+    data = request.get_json()  # We get the body 
+
     title = data.get('title')
     pages = data.get('pages')
     price = data.get('price')
     description = data.get('description')
-    # genre = data.get('genre')
-    isbn = data.get('isbn')
     publication_date = data.get('publication_date')
     image = data.get('image')
     company_id = data.get('company_id')
@@ -34,16 +33,12 @@ def create_newbook():
 
 
 #validating the incoming request
-    if not title  or not description or not price :
+    if not title  or not description or not price or not pages :
             return jsonify({"error": "All fields are required"}), HTTP_400_BAD_REQUEST
 
     
     if Book.query.filter_by(title=title,author_id=author_id).first() is not None:      
           return jsonify({"error": "Book with this title and user id already exists"}), HTTP_400_BAD_REQUEST
-
-
-    if Book.query.filter_by(isbn=isbn).first() is not None:      
-          return jsonify({"error": "Book with this isbn already exists"}), HTTP_400_BAD_REQUEST
 
     try:
           
@@ -62,7 +57,6 @@ def create_newbook():
         'price': new_book.price,
         'description': new_book.description,
         'pages': new_book.pages,
-        'genre': new_book.genre,
         'publication_date': new_book.publication_date,
         'company': {
             'id': new_book.company.id,
@@ -92,7 +86,8 @@ def create_newbook():
 
 
 
-# Define the update book endpoint
+
+# Updating the book endpoint.
 @book.route('/edit/<int:book_id>', methods=["PUT"])
 def update_book(book_id):
     try:
