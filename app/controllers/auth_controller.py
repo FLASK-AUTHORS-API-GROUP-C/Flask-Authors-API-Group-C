@@ -23,8 +23,8 @@ def register_author(): # registering the user
     email = data.get('email')
     password = data.get('password')
     biography = data.get('biography', '')  
-    created_at = data.get('created_at')
-    updated_at= data.get('updated_at')
+    #created_at = data.get('created_at')
+    #updated_at= data.get('updated_at')
 
 
 #Request response cycle 
@@ -42,8 +42,8 @@ def register_author(): # registering the user
     if not validators.email(email): 
         return jsonify({"error":"Email is invalid"}),HTTP_400_BAD_REQUEST
     
-    #key value pairs representing data to be accesed
-    if  Author.query.filter_by(email=email).first() is not None: #Ensuring email and contact constrains 
+    
+    if  Author.query.filter_by(email=email).first() is not None: #Ensuring email and contact constraints 
           return jsonify({"error":"Email address in use"}),HTTP_409_CONFLICT #Accessing the model to check if the email is valid
     
     if Author.query.filter_by(contact=contact).first() is not None:
