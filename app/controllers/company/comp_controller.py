@@ -11,59 +11,47 @@ companies= Blueprint('company', __name__,url_prefix='/api/v1/companies')
 
 # create  company 
 
-@companies.route("/create",methods=['POST'])
+@companies.route("/create", methods=['POST'])
 @jwt_required()
 def create_company():
-
-
-# storing requests
     data = request.json
     name = data.get('name')
-    author_id = get_jwt_identity()
-    origin= data.get('origin')
+    origin = data.get('origin')
+    email = data.get('email')
     description = data.get('description', '')
-    
 
-
-    # validations for the incoming requests
-    if not name or not origin or not description:
-        return jsonify({"error":"All fields are required."}),HTTP_400_BAD_REQUEST
+    # Validations
+    if not name or not origin or not description or not email:
+        return jsonify({"error": "All fields are required."}), HTTP_400_BAD_REQUEST
     
-    
-    
-    if Company.query.filter_by(name = name).first() is not None:
-        return jsonify({"error":"Company name already in use."}),HTTP_409_NOT_CONFLICT
-    
+    if Company.query.filter_by(name=name).first() is not None:
+        return jsonify({"error": "Company name already in use."}), HTTP_409_NOT_CONFLICT
     
     try:
-        
-
-        # Creating a new_company
-        new_company = Company(name = name, author_id = author_id,description = description, origin=origin)
+        # Creating a new company
+        new_company = Company(name=name, description=description, origin=origin, email=email)
         db.session.add(new_company)
         db.session.commit()
 
-        # Company  name
-        company_name =new_company.get_full_name()
+        # Company name
+        company_name = new_company.get_full_name()
 
         return jsonify({
-            "message":company_name + "has been successfully created as a "+ new_company, 
-            "company":{
-                "name":new_company.name,
-                "id":new_company.id,
-                "origin":new_company.origin,
-                "description":new_company.description,
-                }
-                
-            }),HTTP_201_CREATED
-
+            "message": f"{company_name} has been successfully created.", 
+            "company": {
+                "name": new_company.name,
+                "origin": new_company.origin,
+                "description": new_company.description,
+                "email": new_company.email
+            }
+        }), HTTP_201_CREATED
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error':str(e)}),HTTP_500_INTERNAL_SERVER_ERROR
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
-#Reading the company  
-@companies.route('/<int:id>', methods=['GET'])
+#Get company by id  
+@companies.get('/company/<int:id>')#, methods=['GET'])
 @jwt_required()
 def get_company(id):
     company = Company.query.get(id)
@@ -80,7 +68,7 @@ def get_company(id):
     }), HTTP_200_OK 
 
 # Updating a Company
-@companies.route('/update/<int:id>', methods=['PUT'])
+@companies.route('/update/<int:id>', methods=['PUT','PATCH'])
 @jwt_required()
 def update_company(id):
     try:
@@ -119,44 +107,31 @@ def refresh_token(id):
 
 
 # deleting the company
-@companies.route('/delete/<int:company_id>',methods=['DELETE'])
+@companies.route('/delete/<int:company_id>', methods=['DELETE'])
 @jwt_required()
 def delete_company(company_id):
     try:
         current_author_id = get_jwt_identity()
-        logged_in_author =Author.query.filter_by(author_id=current_author_id).first()
-        
-        
+        logged_in_author = Author.query.filter_by(author_id=current_author_id).first()
 
-
-       #Get company by id
         company = Company.query.get(company_id)
 
-
-        # validations
         if not company:
-            return jsonify({"message": "Company not found"}),HTTP_404_NOT_FOUND
+            return jsonify({"message": "Company not found"}), HTTP_404_NOT_FOUND
         
-        if logged_in_author != " author"  or company.author_id != "current_author":
-            return jsonify({"error":"you are not authorized to delete this company"}),HTTP_403_FORBIDDEN
+        # Only the company owner can delete
+        if logged_in_author.id != company.owner_id:
+            return jsonify({"error": "You are not authorized to delete this company"}), HTTP_403_FORBIDDEN
         
-        else:
+        # Delete associated books
+        for book in company.books:  
+            db.session.delete(book)
 
-        
-       
+        db.session.delete(company)
+        db.session.commit()
 
-            #delete the associated book 
+        return jsonify({"message": "Company deleted successfully"}), HTTP_200_OK
 
-            for book in company.book:
-                db.session.delete(book)
-
-            db.session.delete(company)
-            db.session.commit()
-
-
-        return jsonify({"message": "Company deleted successfully"}),HTTP_200_OK
     except Exception as e:
-        db.session.rollback() # rollback in case of an error.
-        return jsonify({"error": str(e)}),HTTP_500_INTERNAL_SERVER_ERROR
-    
-    
+        db.session.rollback()
+        return jsonify({"error": str(e)}), HTTP_500_INTERNAL_SERVER_ERROR

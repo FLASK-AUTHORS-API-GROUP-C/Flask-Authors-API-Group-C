@@ -18,15 +18,18 @@ class Company(db.Model):
     authors = db.relationship("Author", back_populates="company")  # A company has many authors
     books = db.relationship("Book", back_populates="company") 
 
-    def __init__(self, company_id,name,origin,email,description,created_at,updated_at): 
+    def __init__(self,name,origin,description,email): 
                 super(Company,self).__init__()
-                self.company_id =company_id
+                
                 self.name = name
                 self.origin = origin
-                self.email =email
                 self.description = description
-                self.created_at= created_at
-                self.updated_at = updated_at
+                self.email = email
+
+    def get_full_name(self):
+        return f"{self.name} ({self.origin})"
+                
+
             
                  
 

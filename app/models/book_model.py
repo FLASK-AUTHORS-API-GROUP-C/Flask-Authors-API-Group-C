@@ -23,20 +23,15 @@ class Book(db.Model):
     company = db.relationship("Company", back_populates="books")
 
 
-    def __init__(self,book_id,title,price,image,publication_date,description,isbn, no_of_pages,created_at,updated_at,author_id,company_id,author,company): 
+    def __init__(self,title,price,publication_date,description,isbn, no_of_pages,author,company): 
         super(Book,self).__init__()
-        self.book_id =book_id
+
         self.title =title
         self.price =price
-        self.image =image
         self.publication_date =publication_date
         self.description = description
         self.no_of_paages = no_of_pages
         self.isbn = isbn
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.author_id = author_id
-        self.company_id = company_id
         self.company = company
         self.author = author
 
