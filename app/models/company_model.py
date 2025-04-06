@@ -21,9 +21,9 @@ class Company(db.Model):
     
 
 
-    def __init__(self,name, id, origin, description,created_at, updated_at,author_id,author):
+    def __init__(self,name,origin, description,created_at, updated_at,author_id,author):
+              # We donot include the id because it is auto generated
         self.name = name
-        self.id = id
         self.origin = origin
         self.description = description
         self.created_at = created_at

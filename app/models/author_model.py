@@ -20,7 +20,7 @@ class Author(db.Model):
         # Defining all the attributes (Creating a constractor) This is because  incase you create any new user, all these fields will be required
         def __init__(self,first_name,last_name, author_contact,email_addresss,user_type, password, image, biography ):
          
-        #  self.id = id
+           # We donot include the id because it is auto generated
          self.first_name = first_name
          self.last_name = last_name
          self.author_contact = author_contact

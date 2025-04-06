@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
+from app.models.author_model import Author
 from app.status_codes import HTTP_400_BAD_REQUEST,HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND,HTTP_200_OK,HTTP_403_FORBBIDEN,HTTP_409_NOT_CONFLICT,HTTP_409_CONFLICT
 from app.models.company_model import Company
 from app.controllers.auth.auth_controller import auth
-from app.controllers.company.company_controller import company
 from app.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 
 # Company blueprint
 company= Blueprint('company', __name__,url_prefix='/api/v1/company')
@@ -17,11 +18,16 @@ company= Blueprint('company', __name__,url_prefix='/api/v1/company')
 def register_company():
 
 
-# Storing request values.
-    data = request.json # DGetting the body
+# Storing request values an include everything that you mentioned in your model
+    data = request.json # Getting the body
     name = data.get('name')
     origin= data.get('origin')
-    description = data.get('description', '')if type == "description" else ''
+    description = data.get('description', '')
+    created_at = data.get('created_at')
+    updated_at = data.get('updated_at')
+    author = data.get('author')
+    author_id = data.get('author_id')
+    
     
 
 
@@ -36,15 +42,16 @@ def register_company():
     
     try:
         
-        # Creating a instance (company)
-        new_company = Company(name = name,description = description,origin=origin)
+        # Creating a instance (company) and ensure to include everything that you mentioned in your model
+        new_company = Company(name = name,description = description,origin=origin,
+                              created_at=created_at,updated_at=updated_at,author=author,author_id=author_id)
         db.session.add(new_company)
         db.session.commit()
 
     
 
         return jsonify({
-            "message":name + "has been successfully created as a "+ new_company, 
+            "message":new_company.name + "has been successfuly created as a new company", 
             "user":{
                 
                 "id":new_company.id,
@@ -64,9 +71,6 @@ def register_company():
 
 
 
-
-
-
     
 #Getting the company  by id
 @company.route('/company/<int:id>', methods=['GET'])
@@ -75,7 +79,7 @@ def get_company(id):
     company = Company.query.get(id)
 
     if not company:
-        return jsonify({"message": "Company not found"}), HTTP_200_OK
+        return jsonify({"message": "Company not found"}), HTTP_404_NOT_FOUND
 
     return jsonify({
         "id": company.id,
@@ -83,6 +87,7 @@ def get_company(id):
         "description": company.description,
         "origin": company.origin,
     }), HTTP_200_OK 
+
 
 
 
@@ -97,19 +102,19 @@ def updateCompanyDetails(id):
 
     try:
         current_user_id = get_jwt_identity()
-        loggedInUser = Company.query.filter_by(id=current_user_id).first()
+        loggedInUser = Author.query.filter_by(id=current_user_id).first()
 
 
        # updating the request by id parameter
         company = Company.query.filter_by(id=id).first()
 
 
-        if not company:
+        if not auth:
             return jsonify({"message": "Company not found"}), HTTP_404_NOT_FOUND
 
         #  Only the owner can update the company
-        elif loggedInUser.author_type!='admin' and company.author_id!=current_user_id:
-            return jsonify({"message": "Tou are not authorized to update the company details"}), HTTP_403_FORBBIDEN
+        elif auth.type!='admin' and auth.author_id!=current_user_id:
+            return jsonify({"message": "You are not authorized to update the company details"}), HTTP_403_FORBBIDEN
 
         else:
             # Store request data
@@ -165,7 +170,7 @@ def updateCompanyDetails(id):
 def delete_company(id):
     try:
         current_company = get_jwt_identity()
-
+    
         company_to_be_deleted =Company.query.get(id)
 
 
@@ -173,7 +178,7 @@ def delete_company(id):
         if not company_to_be_deleted:
             return jsonify({"message": "Company not found"}),HTTP_404_NOT_FOUND
         
-        if company_to_be_deleted.owner_id != current_company:
+        if company_to_be_deleted.author_id != current_company:
             return jsonify({"message": "Unauthorized"}),HTTP_403_FORBBIDEN
         
         db.session.delete(company_to_be_deleted)

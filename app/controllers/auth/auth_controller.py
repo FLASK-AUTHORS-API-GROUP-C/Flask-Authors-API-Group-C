@@ -139,12 +139,12 @@ def login():
         if author:
             # Corrected variable name and comparison
             is_correct_password = bcrypt.check_password_hash(author.password, password)
-            refresh_token = create_refresh_token(identity=author.id)
+            refresh_token = create_refresh_token(identity=str(author.id))
             
 
             if is_correct_password:
-                access_token = create_access_token(identity=author.id)
-                refresh_token = create_refresh_token(identity=author.id)
+                access_token = create_access_token(identity=str(author.id))
+                refresh_token = create_refresh_token(identity=str(author.id))
 
                 return jsonify({
                     'user': {
@@ -177,9 +177,12 @@ def login():
 @jwt_required(refresh=True)
 def refresh():
     identity = str(get_jwt_identity())
-    access_token = create_access_token(identity=identity)
+    access_token = create_access_token(identity=str(identity))
     return jsonify({"access_token": access_token})
     
+
+
+
 
 
 # Get all  aothors from the database
@@ -263,7 +266,7 @@ def deleteAuthor(id):
 
      except Exception as e:
          return jsonify({
-             'error': 'Athour deleted successflly'
-         }),HTTP_404_NOT_FOUND
+             'Message': 'Athour deleted successflly'
+         }),HTTP_200_OK
 
 

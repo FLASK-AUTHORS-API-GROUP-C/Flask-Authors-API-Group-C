@@ -2,14 +2,11 @@
 # Create a new application function
 # First import the module Flask
 from flask import Flask
-from flask_migrate import migrate
-from flask import Flask, Blueprint
-
-
 #Import the db object
-from app.controllers import company
 from app.extensions import db,migrate,jwt 
 from app.controllers.auth.auth_controller import auth
+from app.controllers.company.company_controller import company
+from app.controllers.books.book_controller import book
 
 
 
@@ -39,6 +36,8 @@ def create_app():
 
 # Regestering blueprints
     app.register_blueprint(auth)
+    app.register_blueprint(company)
+    app.register_blueprint(book)
     
     
     

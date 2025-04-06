@@ -4,6 +4,8 @@ from flask import Blueprint,request,jsonify
 from app.status_codes import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND
 from app.models.book_model import Book
 from app.extensions import db
+from app.models.author_model import Author
+from app.models.company_model import Company
 from flask_jwt_extended import jwt_required,get_jwt_identity
 
 
@@ -29,13 +31,30 @@ def create_newbook():
     image = data.get('image')
     company_id = data.get('company_id')
     author_id = data.get('author_id')
+    description = data.get('description')
+    created_at = data.get('created_at')
+    updated_at = data.get('updated_at')
+    author_id = data.get('author_id')
+    company_id = data.get('company_id')
+    author_id = data.get('author_id')
+    company = Company.query.get('company_id')
+    author = Author.query.get('author_id')
+
+
+
+
+    
 
 
 
 #validating the incoming request
+
+
+
+
     if not title  or not description or not price or not pages :
             return jsonify({"error": "All fields are required"}), HTTP_400_BAD_REQUEST
-
+    
     
     if Book.query.filter_by(title=title,author_id=author_id).first() is not None:      
           return jsonify({"error": "Book with this title and user id already exists"}), HTTP_400_BAD_REQUEST
@@ -44,7 +63,9 @@ def create_newbook():
           
           #creating a new book
 
-          new_book = Book(title=title,pages=pages,image=image,price=price,publication_date=publication_date,company_id=company_id)
+          new_book = Book(title=title,pages=pages,image=image,price=price,publication_date=publication_date,company_id=company_id,
+                           description=description,created_at=created_at, updated_at=updated_at,
+                            author_id=author_id,company=company, author=author )
                         
           db.session.add(new_book)
           db.session.commit()
@@ -87,13 +108,14 @@ def create_newbook():
 
 
 
+
 # Updating the book endpoint.
 @book.route('/edit/<int:book_id>', methods=["PUT"])
-def update_book(book_id):
+def update_book(id):
     try:
         # Extract book data from the request JSON
         data = request.json
-        book = Book.query.get(book_id)
+        book = Book.query.get(id)
         if not book:
             return jsonify({'error': 'Book not found'}), 404
 
@@ -120,15 +142,15 @@ def update_book(book_id):
 # Define the delete book endpoint
 @book.route('/delete/<int:book_id>', methods=["DELETE"])
 @jwt_required()
-def delete_book(book_id):
+def delete_book(id):
     
     try:
-        book_id = Book.query.filter_by(book_id=book_id).first()
+        id = Book.query.filter_by(id=id).first()
         
-        if not book_id:
+        if not id:
             return jsonify({'error': 'Book not found'}),HTTP_404_NOT_FOUND
         else:
-            db.session.delete(book_id)
+            db.session.delete(id)
             db.session.commit()
 
         return jsonify({'message': 'Book deleted successfully'}), 200

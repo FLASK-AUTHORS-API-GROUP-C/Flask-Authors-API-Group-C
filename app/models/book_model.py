@@ -22,9 +22,8 @@ class Book(db.Model):
     updated_at = db.Column(db.DateTime, default = datetime.now())
 
 
-    def __init__(self, id, title, price, description, image, pages, publication_date,created_at,updated_at,company_id,author_id,company,author  ):
-
-        self.id = id
+    def __init__(self,title, price, description, image, pages, publication_date,created_at,updated_at,company_id,author_id,company,author  ):
+   # We donot include the id because it is auto generated
         self.title = title
         self.price = price
         self.description = description
