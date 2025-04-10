@@ -172,6 +172,15 @@ def login():
     
 
 
+
+
+
+
+
+
+
+
+
 # Refreshing Token
 @auth.route("token/refresh", methods=["POST"])
 @jwt_required(refresh=True)
@@ -185,7 +194,7 @@ def refresh():
 
 
 
-# Get all  aothors from the database
+# Get all  authors from the database
 @auth.get('/authors')
 def getAllAuthors():
 
@@ -210,7 +219,8 @@ def getAllAuthors():
             }
 
             if hasattr(author, 'books'):
-                author_info['books'] = [{'id': book.id, 'title': book.title, 'price':book.price, 'genre': book.id, 'price_unit': book.price_unit, 'description': book.description, 'publication': book.publication_date,  'image': book.image, 'created_at': book.created_at} for book in author.books]
+                author_info['books'] = [{'id': book.id, 'title': book.title, 'price':book.price, 'genre': book.id, 
+                     'description': book.description, 'publication': book.publication_date,  'image': book.image, 'created_at': book.created_at} for book in author.books]
 
 
 
@@ -241,14 +251,72 @@ def getAllAuthors():
 
 
 
+
+
+# Getting author by id
+
+@auth.get('/author/<int:id>')
+def get_author_by_id(id):
+
+    try:
+        author = Author.query.filter_by(id = id).first()
+
+        books = []
+        # companies = []
+
+        if hasattr(author, 'books'):
+                books = [{'id': book.id, 'title': book.title, 'price':book.price, 'genre': book.id, 'price_unit': book.price_unit,
+                     'description': book.description, 'publication': book.publication_date,  'image': book.image, 'created_at': book.created_at} for book in author.books]
+
+
+
+        # if hasattr(author, 'companies'):
+        #          companies = [{'id': company.id, 'name':company.name, 'origin': company.origin} for company in author.company]  
+
+       
+
+        # Ensure that the variable is serialised. This means us having the ability to access the value that is converted to json easily.
+        return jsonify({
+            'message':'Authors details retrieved successfuly',
+            'author': {
+                'id':author.id,
+                'first_name':author.first_name,
+                'last_name':author.last_name,
+                'user_name':author.get_full_name(),
+                'email_addresss':author.email_addresss,
+                'author_contact':author.author_contact,
+                'biography': author.biography,
+                'created_at':author.created_at,
+                # 'companies':[],
+                'books':[]
+               
+
+            }
+            }
+
+        ),HTTP_200_OK
+    
+
+
+
+    except Exception as e:
+        return jsonify({
+            'error':str(e)
+        }),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+
+
+
 # Deleting author
 
 @auth.route('/delete/<int:id>', methods = ['DELETE'])
 @jwt_required()
 def deleteAuthor(id):
      try:
-         current_author = get_jwt_identity()
-         loggedInAuthor = Author.query.filter_by(id=current_author).first()
+        #  current_author = get_jwt_identity(id)
+        #  loggedInAuthor = Author.query.filter_by(id=current_author).first()
 
          # Get author by id
          author = Author.query.filter_by(id=id).first()
@@ -256,12 +324,16 @@ def deleteAuthor(id):
 
          if not author: 
              return jsonify({'error': 'Author not found'}),HTTP_404_NOT_FOUND
-         elif loggedInAuthor.author_type!= 'admin':
-             return jsonify({'error': 'You are not authorised to delete this author'}),HTTP_403_FORBBIDEN
          
+        #  elif loggedInAuthor.author_type!= 'admin':
+        #      return jsonify({'error': 'You are not authorised to delete this author'}),HTTP_403_FORBBIDEN
          
-         
+         else:
+             db.session.delete(author)
+             db.session.commit()
 
+             return({'message': 'Author has been successifully deleted'}),HTTP_200_OK
+         
          
 
      except Exception as e:

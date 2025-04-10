@@ -37,19 +37,11 @@ def create_newbook():
     author_id = data.get('author_id')
     company_id = data.get('company_id')
     author_id = data.get('author_id')
-    company = Company.query.get('company_id')
-    author = Author.query.get('author_id')
-
-
-
-
-    
-
+    company = Company.query.get(company_id)
+    author = Author.query.get(author_id)
 
 
 #validating the incoming request
-
-
 
 
     if not title  or not description or not price or not pages :
@@ -58,6 +50,13 @@ def create_newbook():
     
     if Book.query.filter_by(title=title,author_id=author_id).first() is not None:      
           return jsonify({"error": "Book with this title and user id already exists"}), HTTP_400_BAD_REQUEST
+    
+
+    if not company:
+          return jsonify({'error': 'Company not found'}), HTTP_404_NOT_FOUND
+    if not author:
+         return jsonify({'error': 'Author not found'}), HTTP_404_NOT_FOUND
+
 
     try:
           
@@ -73,7 +72,7 @@ def create_newbook():
           return jsonify({
     'message': title + " has been created successfully",
     'book': {
-        'id': new_book.id,
+        # 'id': new_book.id,
         'title': new_book.title,
         'price': new_book.price,
         'description': new_book.description,
@@ -89,8 +88,8 @@ def create_newbook():
         'author':{
               "first_name":new_book.author.first_name,
               "last_name":new_book.author.last_name,
-              "email":new_book.author.email,
-              "contact":new_book.author.contact,
+              "email":new_book.author.email_addresss,
+              "contact":new_book.author.author_contact,
               "type":new_book.author.user_type,
         },
 
@@ -107,10 +106,122 @@ def create_newbook():
 
 
 
+# Getting book by id
+@book.route('/get/<int:id>', methods = ['GET'])
+def get_book_by_id(id):
+     
+     try:
+          book = Book.query.filter_by(id=id).first()
+
+          if not book:
+               return jsonify({'error': 'Book not found!'}),HTTP_404_NOT_FOUND
+          
+          # Else return the book with the specified id
+          return jsonify({
+               'message': 'Book has been successifully retrieved',
+               'book': {
+                    'id': book.id,
+                    'title': book.title,
+                    'price':book.price,
+                    'description': book.description,
+                    'pages': book.pages,
+                    'publication_date': book.publication_date,
+                    'company': {
+                        'id': book.company.id,
+                        'name': book.company.name,
+                        'origin': book.company.origin,
+                        'description': book.company.description,
+                    },
+                    
+                    'author':{
+                        "first_name":book.author.first_name,
+                        "last_name":book.author.last_name,
+                        "email":book.author.email_addresss,
+                        "contact":book.author.author_contact,
+                        "type":book.author.user_type,
+                    },
+
+                    'image': book.image,
+                }
+
+                    })
+          
+     
+     except Exception as e:
+          return jsonify({
+               'error':str(e)
+          }),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+
+
+# Reading/Retrieving/Getting all books
+@book.route('/get', methods = ['GET'])
+def get_all_books():
+     
+     try:
+          
+          all_books = Book.query.all()
+          book_data = []
+
+          for book in all_books:
+               book_information = {
+                  'book': {
+                    'id': book.id,
+                    'title': book.title,
+                    'price':book.price,
+                    'description': book.description,
+                    'pages': book.pages,
+                    'publication_date': book.publication_date,
+                    'company': {
+                        'id': book.company.id,
+                        'name': book.company.name,
+                        'origin': book.company.origin,
+                        'description': book.company.description,
+                    },
+                    
+                    'author':{
+                        "first_name":book.author.first_name,
+                        "last_name":book.author.last_name,
+                        "email":book.author.email_addresss,
+                        "contact":book.author.author_contact,
+                        "type":book.author.user_type,
+                    },
+
+                    'image': book.image,
+                }
+
+                  
+               }
+
+               book_data.append(book_information)
+
+          return jsonify({
+               'message': 'All books have been successifully retrieved',
+               'total': len(book_data),
+               'books': book_data
+          })
+
+
+     except Exception as e:
+          return jsonify({
+               'error':str(e)
+          })
+
+
+
+
+
+
+
+
+
+
 
 
 # Updating the book endpoint.
-@book.route('/edit/<int:book_id>', methods=["PUT"])
+@book.route('/edit/<int:id>', methods=["PUT"])
 def update_book(id):
     try:
         # Extract book data from the request JSON
@@ -140,17 +251,17 @@ def update_book(id):
 
 
 # Define the delete book endpoint
-@book.route('/delete/<int:book_id>', methods=["DELETE"])
+@book.route('/delete/<int:id>', methods=["DELETE"])
 @jwt_required()
 def delete_book(id):
     
     try:
-        id = Book.query.filter_by(id=id).first()
+        book = Book.query.filter_by(id=id).first()
         
-        if not id:
+        if not book:
             return jsonify({'error': 'Book not found'}),HTTP_404_NOT_FOUND
         else:
-            db.session.delete(id)
+            db.session.delete(book)
             db.session.commit()
 
         return jsonify({'message': 'Book deleted successfully'}), 200

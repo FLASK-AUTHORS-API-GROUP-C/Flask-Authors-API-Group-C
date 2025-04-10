@@ -71,6 +71,7 @@ def register_company():
 
 
 
+
     
 #Getting the company  by id
 @company.route('/company/<int:id>', methods=['GET'])
@@ -87,6 +88,49 @@ def get_company(id):
         "description": company.description,
         "origin": company.origin,
     }), HTTP_200_OK 
+
+
+
+
+
+
+# Getting all companies
+
+@company.route('/companies')
+def get_all_companies():
+
+    try:
+
+        all_companies = Company.query.all()
+        company_data = []
+
+        for company in all_companies:
+            company_information = {
+                 "id":company.id,
+                "name":company.name,
+                "origin":company.origin,
+                "description":company.description
+            }
+
+            company_data.append(company_information)
+
+        return jsonify({
+            'message': 'All companies have been successifully retrieved',
+            'total': len(company_data),
+            'companies': company_data
+        })
+
+
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }),HTTP_500_INTERNAL_SERVER_ERROR
+
+
+
+
+
+
 
 
 
@@ -169,7 +213,7 @@ def updateCompanyDetails(id):
 @jwt_required()
 def delete_company(id):
     try:
-        current_company = get_jwt_identity()
+        # current_company = get_jwt_identity()
     
         company_to_be_deleted =Company.query.get(id)
 
@@ -178,11 +222,13 @@ def delete_company(id):
         if not company_to_be_deleted:
             return jsonify({"message": "Company not found"}),HTTP_404_NOT_FOUND
         
-        if company_to_be_deleted.author_id != current_company:
-            return jsonify({"message": "Unauthorized"}),HTTP_403_FORBBIDEN
+        # if company_to_be_deleted.author_id != current_company:
+        #     return jsonify({"message": "Unauthorized"}),HTTP_403_FORBBIDEN
         
-        db.session.delete(company_to_be_deleted)
-        db.session.commit()
+        else:
+
+           db.session.delete(company_to_be_deleted)
+           db.session.commit()
 
         return jsonify({"message": "Company deleted successfully"}),HTTP_200_OK
     except Exception as e:
