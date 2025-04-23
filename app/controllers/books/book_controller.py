@@ -1,7 +1,7 @@
 # Creating a new book
 
 from flask import Blueprint,request,jsonify
-from app.status_codes import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND
+from app.status_codes import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR,HTTP_201_CREATED,HTTP_404_NOT_FOUND,HTTP_200_OK
 from app.models.book_model import Book
 from app.extensions import db
 from app.models.author_model import Author
@@ -144,7 +144,7 @@ def get_book_by_id(id):
                     'image': book.image,
                 }
 
-                    })
+                    }),HTTP_200_OK
           
      
      except Exception as e:
@@ -207,11 +207,7 @@ def get_all_books():
      except Exception as e:
           return jsonify({
                'error':str(e)
-          })
-
-
-
-
+          }),HTTP_500_INTERNAL_SERVER_ERROR
 
 
 
@@ -238,11 +234,11 @@ def update_book(id):
         db.session.commit()
 
         # Return a success response
-        return jsonify({'message': 'Book updated successfully'}), 200
+        return jsonify({'message': 'Book updated successfully'}),HTTP_200_OK 
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
 
 

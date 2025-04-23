@@ -22,7 +22,7 @@ class Company(db.Model):
 
 
     def __init__(self,name,origin, description,created_at, updated_at,author_id,author):
-              # We donot include the id because it is auto generated
+        # We donot include the id because it is auto generated
         self.name = name
         self.origin = origin
         self.description = description
