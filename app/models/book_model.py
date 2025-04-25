@@ -30,7 +30,7 @@ class Book(db.Model):
         self.price =price
         self.publication_date =publication_date
         self.description = description
-        self.no_of_paages = no_of_pages
+        self.no_of_pages = no_of_pages
         self.isbn = isbn
         self.company = company
         self.author = author

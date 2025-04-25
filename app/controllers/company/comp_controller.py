@@ -51,21 +51,27 @@ def create_company():
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
 #Get company by id  
-@companies.get('/company/<int:id>')#, methods=['GET'])
+@companies.get('/company/<int:company_id>')#, methods=['GET'])
 @jwt_required()
-def get_company(id):
-    company = Company.query.get(id)
+def get_company(company_id):
 
-    if not company:
-        return jsonify({"message": "Company not found"}), HTTP_200_OK
+    try:
+                company = Company.query.filter_by(company_id=company_id).first()
+                if not company:
+                    return jsonify({"message": "Company not found"}), HTTP_200_OK
 
-    return jsonify({
-        "id": company.id,
-        "name": company.name,
-        "description": company.description,
-        "location": company.location,
-        "owner_id": company.owner_id
-    }), HTTP_200_OK 
+                return jsonify({
+                    "company_id": company.company_id,
+                    "name": company.name,
+                    "description": company.description,
+                    "origin": company.origin,
+                    "email": company.email
+                    
+                }), HTTP_200_OK 
+    except Exception as e:
+            return jsonify({"error": str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+
 
 # Updating a Company
 @companies.route('/update/<int:id>', methods=['PUT','PATCH'])

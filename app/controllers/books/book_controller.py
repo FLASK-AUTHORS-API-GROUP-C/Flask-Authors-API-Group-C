@@ -49,7 +49,7 @@ def createNewBook():
         return jsonify({"error": "Invalid price format."}), HTTP_400_BAD_REQUEST
 
     # Check if the incoming book title is similar with the existing one
-    if Book.query.filter_by(title=title, author_id=author_id).first() is not None:
+    if Book.query.filter_by(title=title, author_id = author_id).first() is not None:
         return jsonify({"error": "Book with this title and author_id already exists."}), HTTP_409_NOT_CONFLICT
 
     # Check if the incoming book isbn is similar with the existing one
@@ -72,11 +72,11 @@ def createNewBook():
 
         # Creating a new book with all the necessary fields
         new_book = Book(
-            title=title,
-            price=price,
-            publication_date=publication_date,
-            description=description,
-            no_of_pages=no_of_pages,
+            title = title,
+            price = price,
+            publication_date = publication_date,
+            description = description,
+            no_of_pages = no_of_pages,
             isbn=isbn,
             author=author,  
             company=company
@@ -90,7 +90,7 @@ def createNewBook():
             "message": title + " has been successfully created.",
             "book": {
                 "title": new_book.title,
-                "book_id": new_book.id,
+                "book_id": new_book.book_id,
                 "price": new_book.price,
                 "description": new_book.description,
                 "no_of_pages": new_book.no_of_pages,
@@ -98,9 +98,9 @@ def createNewBook():
                 "isbn": new_book.isbn,
                 "company": {
                     "name": new_book.company.name,
-                    "id": new_book.company.id,
+                    "company_id": new_book.company.company_id,
                     "email": new_book.company.email,
-                    "contact": new_book.company.contact,
+            
                     "origin": new_book.company.origin,
                     "description": new_book.company.description
                 },
@@ -118,3 +118,46 @@ def createNewBook():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+    
+@books.route('/books/<int:book_id>', methods=['GET'])
+# @jwt_required()
+def get_book(book_id):
+
+
+    try:
+        book = Book.query.filter_by(book_id = book_id).first()
+
+        if not Book:
+            return jsonify({"message": "Book not found"}), HTTP_200_OK
+
+        return jsonify({
+                "message": "Book has been successfully created.",
+                "book": {
+                    "title": book.title,
+                    "book_id": book.book_id,
+                    "price": book.price,
+                    "description": book.description,
+                    "no_of_pages": book.no_of_pages,
+                    "publication_date": book.publication_date,
+                    "isbn": book.isbn,
+                    "company": {
+                        "name": book.company.name,
+                        "company_id": book.company.company_id,
+                        "email": book.company.email,
+                        "origin": book.company.origin,
+                        "description": book.company.description
+                    },
+                    "author": {
+                        "first_name": book.author.first_name,
+                        "last_name": book.author.last_name,
+                        "email": book.author.email,
+                        "contact": book.author.contact,
+                        "password": book.author.password,
+                        "bio": book.author.bio
+                    }
+                }
+        }), HTTP_200_OK
+
+    except Exception as e:
+            db.session.rollback()
+            return jsonify({'error':str(e)}),HTTP_500_INTERNAL_SERVER_ERROR

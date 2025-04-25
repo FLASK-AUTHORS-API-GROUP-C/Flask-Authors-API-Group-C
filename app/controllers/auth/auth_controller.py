@@ -239,48 +239,20 @@ def get_author(author_id):
 
 
 # Updating the author details
-@auth.route('/edit/<int:id>', methods=['PUT', 'PATCH'])
+@auth.route('/edit/<int:author_id>', methods=['GET'])
 @jwt_required()  # protecting the route with authentications
 def update_author_details(author_id):
     try:
-        # To get the currently logged-in author.
-        current_author = get_jwt_identity()  # returns the id of the currently logged-in user.
-        logged_in_author = Author.query.filter_by(author_id=current_author).first()
-
+        
         author = Author.query.filter_by(author_id=author_id).first()
 
         if not author:
             return jsonify({"error": "Author not found."}), HTTP_404_NOT_FOUND
         
-        elif logged_in_author.author_id != author_id:
-            return jsonify({"error": "You are not authorized to update the author details"})
+        
 
         else:
-            data = request.get_json()  # Get request data
-
-            first_name = data.get('first_name', author.first_name)
-            last_name = data.get('last_name', author.last_name)
-            email = data.get('email', author.email)
-            contact = data.get('contact', author.contact)
-            bio = data.get('bio', author.bio)
-
-            if "password" in data:
-                hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-                author.password = hashed_password
-
-            if email != author.email and Author.query.filter_by(email=email).first():
-                return jsonify({"error": "Email address already in use"}), HTTP_409_NOT_CONFLICT
-            
-            if contact != author.contact and Author.query.filter_by(contact=contact).first():
-                return jsonify({"error": "Contact already in use."}), HTTP_409_NOT_CONFLICT
-
-            author.first_name = first_name
-            author.last_name = last_name
-            author.email = email
-            author.contact = contact
-            author.bio = bio
-
-            db.session.commit()
+        
 
             author_name = author.get_full_name()
 
@@ -297,6 +269,37 @@ def update_author_details(author_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+        
+# Resetting the password
+@auth.route('/reset-password', methods=['POST'])
+def reset_password():
+        data = request.get_json()
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        new_password = data.get('new_password')
+
+        if not first_name or not last_name or not new_password:
+            return jsonify({"error": "First_name , last_name and new password are required."}), HTTP_400_BAD_REQUEST
+
+        try:
+            author = Author.query.filter_by(first_name = first_name , last_name = last_name).first()
+
+            if not author:
+                return jsonify({"error": "Author not found."}), HTTP_404_NOT_FOUND
+
+            hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            author.password = hashed_password
+
+            db.session.commit()
+
+            return jsonify({"message": "Password reset successfully"}), HTTP_200_OK
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+
     
 
 # deleting the author
@@ -305,7 +308,21 @@ def update_author_details(author_id):
 def delete_author(author_id):
     author = Author.query.get(author_id)
     if not author:
-        return jsonify({"message": "Order not found"}),HTTP_404_NOT_FOUND
-    db.session.delete(author)
-    db.session.commit()
-    return jsonify({"message": "Order deleted successfully"}),HTTP_200_OK
+        return jsonify({"message": "Author not found."}), HTTP_404_NOT_FOUND
+    try:
+        #delete associated companies if they exist
+        if hasattr(author, 'companies') and author.companies:
+            for company in author.companies:
+                db.session.delete(company)
+        # delete associated books if they exist
+        if hasattr(author, 'books') and author.books:
+            for book in author.books:
+                db.session.delete(book)
+
+        # Delete the author
+        db.session.delete(author)
+        db.session.commit()
+        return jsonify({"message": "Author deleted successfully"}), HTTP_200_OK
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
