@@ -8,13 +8,14 @@ class Author(db.Model):        # The datatype and word limit should be defined e
     first_name = db.Column(db.String(30),nullable=False)
     last_name = db.Column(db.String(20),nullable=False)
     biography = db.Column(db.String(20),nullable=True)
+    user_type = db.Column(db.String(20), default = 'author')
     contact = db.Column(db.String(30),nullable=False,unique = True)
     email= db.Column(db.String(20),nullable=False, unique=True)
     password= db.Column(db.String(250),nullable=False)
     created_at = db.Column(db.DateTime, default= datetime.now)
     updated_at = db.Column(db.DateTime,onupdate= datetime.now) 
     
-    def __init__(self,first_name,last_name,contact,email,password, biography):
+    def __init__(self,first_name,last_name,contact,email,password, biography, user_type = "author"):
         super(Author,self).__init__()
         self.first_name = first_name
         self.last_name = last_name
@@ -22,6 +23,7 @@ class Author(db.Model):        # The datatype and word limit should be defined e
         self.email = email
         self.password= password
         self.biography = biography
+        self.user_type = user_type
         self.book = []
 
     def get_full_name(self):

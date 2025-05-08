@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class Book(db.Model):
-    __tablename__ = "books"
+    __tablename__ = "book"
     id= db.Column(db.Integer, primary_key=True)
     title= db.Column(db.String(30),nullable=False)
     price= db.Column(db.String(20),nullable=False)
@@ -18,8 +18,8 @@ class Book(db.Model):
     unit_price = db.Column(db.String(20),nullable=False)
     author_id =db.Column(db.Integer,db.ForeignKey("authors.id"))
     company_id =db.Column(db.Integer,db.ForeignKey("companies.id"))
-    author = db.relationship('Author',backref = 'books')
-    company = db.relationship('Company',backref = 'books')
+    author = db.relationship('Author',backref = 'book')
+    company = db.relationship('Company',backref = 'book')
     created_at = db.Column(db.DateTime, default= datetime.now())
     updated_at = db.Column(db.DateTime,onupdate= datetime.now()) 
     

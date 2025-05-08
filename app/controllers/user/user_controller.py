@@ -14,9 +14,9 @@ from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 users = Blueprint('users',__name__,url_prefix='/api/v1/users') # defining the prefix for api,version 1 and the table
 
 
-# getting all users from the database
+# getting all athors from the database
 @users.get('/')
-def getAllUsers():
+def getAllAuthors():
     # email = request.json.get('email')
     # password = request.json.get('password')
 
